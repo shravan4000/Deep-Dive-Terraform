@@ -6,7 +6,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~>3.0"
+      version = "~>4.37"
     }
     consul = {
       source  = "hashicorp/consul"
@@ -53,6 +53,8 @@ data "consul_keys" "networking" {
 locals {
   cidr_block   = jsondecode(data.consul_keys.networking.var.networking)["cidr_block"]
   subnet_count = jsondecode(data.consul_keys.networking.var.networking)["subnet_count"]
+  private_subnets = jsondecode(data.consul_keys.networking.var.networking)["private_subnets"]
+  public_subnets  = jsondecode(data.consul_keys.networking.var.networking)["public_subnets"]
   common_tags = merge(jsondecode(data.consul_keys.networking.var.common_tags),
     {
       Environment = terraform.workspace
@@ -73,8 +75,8 @@ module "vpc" {
 
   cidr            = local.cidr_block
   azs             = slice(data.aws_availability_zones.available.names, 0, local.subnet_count)
-  private_subnets = data.template_file.private_cidrsubnet.*.rendered
-  public_subnets  = data.template_file.public_cidrsubnet.*.rendered
+  private_subnets = local.private_subnets
+  public_subnets  = local.public_subnets
 
   enable_nat_gateway = false
 
