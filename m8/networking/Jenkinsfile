@@ -1,7 +1,7 @@
 pipeline {
     agent any
     tools {
-        "org.jenkinsci.plugins.terraform.TerraformInstallation" "Terraform"
+        "org.jenkinsci.plugins.terraform.TerraformInstallation" "Terraform 1.3.2"
     }
     parameters {
         string(name: 'CONSUL_STATE_PATH', defaultValue: 'networking/state/globo-primary', description: 'Path in Consul for state data')
